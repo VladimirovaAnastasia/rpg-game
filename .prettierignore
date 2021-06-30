@@ -1,0 +1,16 @@
+# Ignore artifacts:
+build
+coverage
+
+# Ignore all HTML files:
+*.html
+
+**/*.js
+
+!src/**/*.js
+
+*.md
+
+*.json
+
+.prettierrc
