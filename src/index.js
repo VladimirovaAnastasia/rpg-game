@@ -4,6 +4,9 @@ import SenseiWalk from './assets/Female-5-Walk.png';
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
 
+const layoutCanvas = document.querySelector('#game-layout');
+const layoutCtx = layoutCanvas.getContext('2d');
+
 const spriteH = 48;
 const spriteW = 48;
 const canvasWidth = canvas.width;
@@ -80,3 +83,10 @@ img.addEventListener('load', () => {
     ctx.drawImage(img, cycle * spriteW, direction * spriteW, spriteH, spriteW, pX, pY, 48, 48);
   }, 120);
 });
+
+layoutCtx.strokeStyle = 'green';
+for (let i = 0; i < canvasWidth / spriteW; i++) {
+  for (let j = 0; j < canvasHeight / spriteH; j++) {
+    layoutCtx.strokeRect(i * (spriteW - 2), j * (spriteH - 2), spriteW, spriteH);
+  }
+}
