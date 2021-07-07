@@ -146,3 +146,16 @@ body {
   left: 0;
   z-index: 100;
 }
+
+#game {
+  background-color: transparent;
+  z-index: 2;
+}
+
+#game-layout {
+  z-index: 0;
+}
+
+h3 {
+  z-index: 1;
+}
