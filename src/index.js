@@ -1,5 +1,8 @@
 import './index.scss';
 import SenseiWalk from './assets/Female-5-Walk.png';
+import ClientGame from './client/ClientGame';
+
+const header = document.getElementById('loading-header');
 
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
@@ -14,45 +17,17 @@ const canvasHeight = canvas.height;
 const shots = 3;
 let cycle = 0;
 
-let bottomPressed = false;
-let topPressed = false;
-let leftPressed = false;
-let rightPressed = false;
+let button = null;
 let pY = (canvasWidth - spriteW) / 2;
 let pX = (canvasHeight - spriteH) / 2;
 let direction = 0;
 
+// Логика движения игрока
 const keyUpHandler = (e) => {
-  if (e.key === 'Down' || e.key === 'ArrowDown') {
-    bottomPressed = false;
-    direction = 0;
-  }
-  if (e.key === 'Up' || e.key === 'ArrowUp') {
-    topPressed = false;
-    direction = 3;
-  }
-  if (e.key === 'Left' || e.key === 'ArrowLeft') {
-    leftPressed = false;
-    direction = 1;
-  }
-  if (e.key === 'Right' || e.key === 'ArrowRight') {
-    rightPressed = false;
-    direction = 2;
-  }
+  button = null;
 };
 const keyDownHandler = (e) => {
-  if (e.key === 'Down' || e.key === 'ArrowDown') {
-    bottomPressed = true;
-  }
-  if (e.key === 'Up' || e.key === 'ArrowUp') {
-    topPressed = true;
-  }
-  if (e.key === 'Left' || e.key === 'ArrowLeft') {
-    leftPressed = true;
-  }
-  if (e.key === 'Right' || e.key === 'ArrowRight') {
-    rightPressed = true;
-  }
+  button = e.key;
 };
 
 document.addEventListener('keyup', keyUpHandler);
@@ -61,32 +36,53 @@ document.addEventListener('keydown', keyDownHandler);
 const img = document.createElement('img');
 img.src = SenseiWalk;
 
+const walk = () => {
+  switch (button) {
+    case 'Down':
+    case 'ArrowDown':
+      if (pY < canvasHeight - spriteH) {
+        direction = 0;
+        pY += 10;
+        cycle = (cycle + 1) % shots;
+      }
+      break;
+    case 'Up':
+    case 'ArrowUp':
+      if (pY > 0) {
+        direction = 3;
+        pY -= 10;
+        cycle = (cycle + 1) % shots;
+      }
+      break;
+    case 'Right':
+    case 'ArrowRight':
+      if (pX < canvasWidth - spriteW) {
+        direction = 2;
+        pX += 10;
+        cycle = (cycle + 1) % shots;
+      }
+      break;
+    case 'Left':
+    case 'ArrowLeft':
+      if (pX > 0) {
+        direction = 1;
+        pX -= 10;
+        cycle = (cycle + 1) % shots;
+      }
+      break;
+  }
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.drawImage(img, cycle * spriteW, direction * spriteW, spriteH, spriteW, pX, pY, 48, 48);
+
+  requestAnimationFrame(walk);
+};
+
 img.addEventListener('load', () => {
-  setInterval(() => {
-    if (bottomPressed && pY < canvasHeight - spriteH) {
-      pY += 10;
-      cycle = (cycle + 1) % shots;
-    }
-    if (topPressed && pY > 0) {
-      pY -= 10;
-      cycle = (cycle + 1) % shots;
-    }
-    if (rightPressed && pX < canvasWidth - spriteW) {
-      pX += 10;
-      cycle = (cycle + 1) % shots;
-    }
-    if (leftPressed && pX > 0) {
-      pX -= 10;
-      cycle = (cycle + 1) % shots;
-    }
-    ctx.clearRect(0, 0, 600, 600);
-    ctx.drawImage(img, cycle * spriteW, direction * spriteW, spriteH, spriteW, pX, pY, 48, 48);
-  }, 120);
+  requestAnimationFrame(walk);
 });
 
-layoutCtx.strokeStyle = 'green';
-for (let i = 0; i < canvasWidth / spriteW; i++) {
-  for (let j = 0; j < canvasHeight / spriteH; j++) {
-    layoutCtx.strokeRect(i * (spriteW - 2), j * (spriteH - 2), spriteW, spriteH);
-  }
-}
+// Инициализация игры
+window.addEventListener('load', () => {
+  header.classList.add('hide');
+  ClientGame.init({ tagId: 'game-layout', spriteW, spriteH });
+});
