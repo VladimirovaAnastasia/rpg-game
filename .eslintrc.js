@@ -12,6 +12,11 @@ module.exports = {
     'no-plusplus': 'off',
     'no-unused-vars': 'warn',
     'default-case': 'warn',
-    'object-curly-newline': 'off'
+    'object-curly-newline': 'off',
+    'camelcase': 'off',
+    'no-unused-expressions': 'off',
+    'no-param-reassign': 'off',
+    'no-irregular-whitespace': 'off',
+    'max-len': ["error", { "code": 105 }]
   },
 };
