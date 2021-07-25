@@ -17,10 +17,15 @@ class ClientGame {
     this.player = player;
   }
 
+  getWorld() {
+    return this.map;
+  }
+
   initEngine() {
     this.engine.loadSprites(sprites).then(() => {
       this.map.init();
       this.engine.on('render', (_, time) => {
+        this.engine.camera.focusGameObject(this.player);
         this.map.render(time);
       });
       this.engine.start();
@@ -33,31 +38,39 @@ class ClientGame {
   }
 
   createEngine() {
-    return new ClientEngine(document.getElementById(this.cfg.tagId));
+    return new ClientEngine(document.getElementById(this.cfg.tagId), this);
+  }
+
+  movePlayerToDir(dir) {
+    const dirs = {
+      left: [-1, 0],
+      right: [1, 0],
+      up: [0, -1],
+      down: [0, 1],
+    };
+
+    const { player } = this;
+
+    if (player && player.motionProgress === 1) {
+      const canMove = this.player.moveByCellCoord(
+        dirs[dir][0],
+        dirs[dir][1],
+        (cell) => cell.findObjectsByType('grass').length,
+      );
+
+      if (canMove) {
+        player.setState(dir);
+        player.once('motion-stopped', () => player.setState('main'));
+      }
+    }
   }
 
   initKeys() {
     this.engine.input.onKey({
-      ArrowLeft: (keyDown) => {
-        if (keyDown) {
-          this.player.moveByCellCoord(-1, 0, (cell) => cell.findObjectsByType('grass').length);
-        }
-      },
-      ArrowRight: (keyDown) => {
-        if (keyDown) {
-          this.player.moveByCellCoord(1, 0, (cell) => cell.findObjectsByType('grass').length);
-        }
-      },
-      ArrowUp: (keyDown) => {
-        if (keyDown) {
-          this.player.moveByCellCoord(0, -1, (cell) => cell.findObjectsByType('grass').length);
-        }
-      },
-      ArrowDown: (keyDown) => {
-        if (keyDown) {
-          this.player.moveByCellCoord(0, 1, (cell) => cell.findObjectsByType('grass').length);
-        }
-      },
+      ArrowLeft: (keyDown) => keyDown && this.movePlayerToDir('left'),
+      ArrowRight: (keyDown) => keyDown && this.movePlayerToDir('right'),
+      ArrowUp: (keyDown) => keyDown && this.movePlayerToDir('up'),
+      ArrowDown: (keyDown) => keyDown && this.movePlayerToDir('down'),
     });
   }
 
